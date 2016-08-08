@@ -1,0 +1,21 @@
+{
+  "name": "bundl-minify",
+  "version": "1.0.0",
+  "description": "Minify javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seebigs/bundl-minify.git"
+  },
+  "author": "Chris Bigelow <seebigswork@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seebigs/bundl-minify/issues"
+  },
+  "dependencies": {
+    "uglify-js": "^2.6.1"
+  }
+}
