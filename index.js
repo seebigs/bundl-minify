@@ -17,7 +17,7 @@ module.exports = function (options) {
 
     var prefix = '//# sourceMappingURL=';
 
-    function minifyEach (contents, r) {
+    function one (contents, r) {
         var bundl = this;
         var mapName, result;
 
@@ -51,13 +51,11 @@ module.exports = function (options) {
             }
         }
 
-        // console.log(result.map);
-
         return result.code;
     }
 
     return {
-        each: minifyEach
+        one: one
     };
 
 };
