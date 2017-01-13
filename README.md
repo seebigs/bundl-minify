@@ -18,7 +18,8 @@ var minify = require('bundl-minify');
 
 bundl(targets)
     .then(minify())
-    .then(write());
+    .then(write())
+    .all();
 ```
 
 ## Options
