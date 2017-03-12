@@ -11,7 +11,7 @@ module.exports = function (options) {
     var opts = {
         charset: options.charset || 'utf8',
         fromString: true,
-        warnings: true,
+        warnings: typeof options.warnings === 'undefined' ? true : options.warnings,
         output: options.output
     };
 
