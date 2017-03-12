@@ -16,6 +16,6 @@
     "url": "https://github.com/seebigs/bundl-minify/issues"
   },
   "dependencies": {
-    "uglify-js": "^2.7.5"
+    "uglify-js": "^2.8.12"
   }
 }
