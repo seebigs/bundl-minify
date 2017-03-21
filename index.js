@@ -8,12 +8,11 @@ var ugly = require('uglify-js');
 module.exports = function (options) {
     options = options || {};
 
-    var opts = {
-        charset: options.charset || 'utf8',
+    var opts = Object.assign({
+        charset: 'utf8',
         fromString: true,
-        warnings: typeof options.warnings === 'undefined' ? true : options.warnings,
-        output: options.output
-    };
+        warnings: true
+    }, options.uglify);
 
     var prefix = '//# sourceMappingURL=';
 

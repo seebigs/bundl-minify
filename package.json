@@ -4,7 +4,7 @@
   "description": "Minify javascript while you bundle",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/automated"
   },
   "repository": {
     "type": "git",
@@ -17,5 +17,8 @@
   },
   "dependencies": {
     "uglify-js": "^2.8.12"
+  },
+  "devDependencies": {
+    "feather-test": "^1.3.1"
   }
 }
