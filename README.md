@@ -13,10 +13,10 @@ $ npm install --save-dev bundl-minify
 ## Use
 
 ```js
-var bundl = require('bundl');
+var Bundl = require('bundl');
 var minify = require('bundl-minify');
 
-bundl(targets)
+new Bundl(targets)
     .then(minify())
     .then(write())
     .go();

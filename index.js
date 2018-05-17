@@ -2,59 +2,83 @@
  * Minify extension for Bundl
  */
 
-var path = require('path');
-var ugly = require('uglify-js');
+var childProcess = require('child_process');
 
 module.exports = function (options) {
     options = options || {};
 
-    var opts = Object.assign({
-        charset: 'utf8',
-        fromString: true,
-        warnings: true
-    }, options.uglify);
+    var opts = Object.assign({}, options.uglify);
 
-    var prefix = '//# sourceMappingURL=';
+    var cache = {};
 
-    function one (contents, r) {
-        var bundl = this;
-        var mapName, result;
+    function minify (r, done) {
+        var contentsString = r.contents.getString();
+        var contentsHash = r.contents.getHash();
+        var cached = contentsHash ? cache[contentsHash] : null;
 
-        if (options.sourcemap) {
-            if (options.sourcemap === true) {
-                // url based on output filename
-                mapName = r.name + '.map';
-
-            } else if (options.sourcemap.inline) {
-                // inline the data
-                mapName = 'inline';
-
-            } else if (options.sourcemap.url) {
-                // use custom url if provided
-                mapName = options.sourcemap.url;
-            }
-            opts.outSourceMap = mapName;
+        if (r.changed) {
+            cache = {};
         }
 
-        result = ugly.minify(contents, opts);
+        if (cached) {
+            r.contents.set(cached);
+            done();
 
-        if (mapName) {
-            if (mapName === 'inline') {
-                // replace `inline` with encoded map
-                var base64Map = new ArrayBuffer(JSON.stringify(sourceMap)).toString('base64');
-                result.code = result.code.replace(prefix + 'inline', prefix + 'data:application/json;charset=' + opts.charset + ';base64,' + base64Map);
-
-            } else {
-                // try to save sourcemap to disk
-                bundl.utils.writeFile(path.resolve(path.dirname(r.dest), mapName), result.map);
-            }
+        } else {
+            var child = childProcess.fork(__dirname + '/process_uglify.js');
+            child.on('message', (result) => {
+                child.kill();
+                if (result.error) {
+                    throw new Error(result.error.stack);
+                } else {
+                    cache[contentsHash] = result.code;
+                    r.contents.set(result.code);
+                    done();
+                }
+            });
+            child.send({
+                contentsString,
+                opts,
+            });
         }
-
-        return result.code;
     }
 
     return {
-        one: one
+        name: 'minify',
+        stage: 'stringy',
+        ext: ['js'],
+        exec: minify,
     };
 
 };
+
+
+// var prefix = '//# sourceMappingURL=';
+// var mapName;
+// if (options.sourcemap) {
+//     if (options.sourcemap === true) {
+//         // url based on output filename
+//         mapName = r.name + '.map';
+//
+//     } else if (options.sourcemap.inline) {
+//         // inline the data
+//         mapName = 'inline';
+//
+//     } else if (options.sourcemap.url) {
+//         // use custom url if provided
+//         mapName = options.sourcemap.url;
+//     }
+//     opts.outSourceMap = mapName;
+// }
+
+// if (mapName) {
+//     if (mapName === 'inline') {
+//         // replace `inline` with encoded map
+//         var base64Map = new ArrayBuffer(JSON.stringify(sourceMap)).toString('base64');
+//         result.code = result.code.replace(prefix + 'inline', prefix + 'data:application/json;charset=' + opts.charset + ';base64,' + base64Map);
+//
+//     } else {
+//         // try to save sourcemap to disk
+//         // utils.writeFile(path.resolve(path.dirname(r.dest), mapName), result.map);
+//     }
+// }
